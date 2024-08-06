@@ -10,11 +10,27 @@ const server = app.listen(443, function () {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const db = new sqlite3.Database('test.db', sqlite3.OPEN_READWRITE, (err) => {
+const db = new sqlite3.Database('/home/node/tasks.db', sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     console.error(err.message);
+  } else {
+    console.log('Connected to the task database.');
+
+    db.run(`CREATE TABLE IF NOT EXISTS tasks (
+      taskid INTEGER PRIMARY KEY AUTOINCREMENT,
+      Title TEXT NOT NULL,
+      description TEXT,
+      status TEXT NOT NULL,
+      created DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, (err) => {
+      if (err) {
+        console.error(err.message);
+      } else {
+        console.log('Table "tasks" has been created.');
+      }
+    });
   }
-  console.log('Connected to the task database.');
 });
 
 app.get('/tasks/', function (req, res) {
@@ -24,7 +40,6 @@ app.get('/tasks/', function (req, res) {
       res.status(500).send('Internal Server Error');
       return;
     }
-    // Respond with a JSON array of tasks
     res.json(rows);
   });
 });
@@ -36,12 +51,10 @@ app.get('/tasks/:id', function (req, res) {
       res.status(500).send('Internal Server Error');
       return;
     }
-    // Check if the task exists
     if (!row) {
       res.status(404).send('Task not found');
       return;
     }
-    // Send the query result as JSON response
     res.json(row);
   });
 });
@@ -57,21 +70,17 @@ app.put('/tasks/:id', function (req, res) {
         return;
       }
 
-      // Check if any rows were updated
       if (this.changes === 0) {
         res.status(404).send('Task not found');
         return;
       }
 
-      // Query for the updated record
       db.get('SELECT taskid, Title, description, status, updated FROM tasks WHERE taskid = ?', [req.params.id], function (err, row) {
         if (err) {
           console.log(err.message);
           res.status(500).send('Internal Server Error');
           return;
         }
-
-        // Send the updated record as JSON
         res.json(row);
       });
     }
@@ -89,18 +98,14 @@ app.post('/tasks', function (req, res) {
       return;
     }
 
-    // Use the lastID property to get the ID of the inserted row
     const lastId = this.lastID;
 
-    // Retrieve the newly inserted record
     db.get('SELECT taskid, Title, description, status FROM tasks WHERE taskid = ?', [lastId], function (err, row) {
       if (err) {
         console.log(err.message);
         res.status(500).send('Internal Server Error');
         return;
       }
-
-      // Return the inserted record as JSON
       res.status(201).json(row);
     });
   });
@@ -117,15 +122,12 @@ app.delete('/tasks/:id', function (req, res) {
         return;
       }
 
-      // Check if any rows were deleted
       if (this.changes === 0) {
         res.status(404).send('Task not found');
         return;
       }
 
       console.log('Deleted record:', req.params.id);
-
-      // Send 204 No Content
       res.status(204).send();
     }
   );
