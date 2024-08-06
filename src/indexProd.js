@@ -10,7 +10,7 @@ const server = app.listen(443, function () {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const db = new sqlite3.Database('/home/node/tasks.db', sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err) => {
+const db = new sqlite3.Database('tasks.db', sqlite3.OPEN_CREATE | sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     console.error(err.message);
   } else {
