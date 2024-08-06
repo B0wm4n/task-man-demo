@@ -33,6 +33,14 @@ const db = new sqlite3.Database('/home/node/tasks.db', sqlite3.OPEN_CREATE | sql
   }
 });
 
+// Define valid statuses as uppercase
+const VALID_STATUSES = ['PENDING', 'IN PROGRESS', 'COMPLETED'];
+
+function isValidStatus(status) {
+  // Compare the Status values as UPPERCASE
+  return VALID_STATUSES.includes(status.toUpperCase());
+}
+
 app.get('/tasks/', function (req, res) {
   db.all("SELECT taskid, Title, description, status FROM tasks ORDER BY updated DESC", [], (err, rows) => {
     if (err) {
@@ -60,6 +68,13 @@ app.get('/tasks/:id', function (req, res) {
 });
 
 app.put('/tasks/:id', function (req, res) {
+  
+  // Validate the status
+  if (status && !isValidStatus(req.body.status)) {
+    res.status(400).send('Invalid status value');
+    return;
+  }
+
   db.run(
     'UPDATE tasks SET Title = ?, description = ?, status = ?, updated = CURRENT_TIMESTAMP WHERE taskid = ?',
     [req.body.title, req.body.description, req.body.status, req.params.id],
@@ -88,9 +103,14 @@ app.put('/tasks/:id', function (req, res) {
 });
 
 app.post('/tasks', function (req, res) {
-  const sql = 'INSERT INTO tasks (Title, description, status) VALUES (?, ?, "PENDING")';
 
-  db.run(sql, [req.body.title, req.body.description], function (err) {
+  // Validate the status
+  if (status && !isValidStatus(req.body.status)) {
+    res.status(400).send('Invalid status value');
+    return;
+  }
+
+  db.run('INSERT INTO tasks (Title, description, status) VALUES (?, ?, ?)', [req.body.title, req.body.description, req.body.status], function (err) {
     if (err) {
       console.log(err.message);
       res.status(500).send('Internal Server Error');
