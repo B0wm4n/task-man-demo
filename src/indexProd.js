@@ -3,8 +3,8 @@ const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 
 const app = express();
-const server = app.listen(443, function () {
-   console.log("Express App running at https://127.0.0.1:443/");
+const server = app.listen(80, function () {
+   console.log("Express App running at https://127.0.0.1:80/");
 });
 
 app.use(bodyParser.json());

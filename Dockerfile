@@ -33,7 +33,7 @@ USER node
 COPY . .
 
 # Expose the port that the application listens on.
-EXPOSE 443
+EXPOSE 80 
 
 # Run the application.
 CMD node src/indexProd.js
