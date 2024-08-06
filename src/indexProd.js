@@ -70,7 +70,7 @@ app.get('/tasks/:id', function (req, res) {
 app.put('/tasks/:id', function (req, res) {
   
   // Validate the status
-  if (status && !isValidStatus(req.body.status)) {
+  if (!isValidStatus(req.body.status)) {
     res.status(400).send('Invalid status value');
     return;
   }
@@ -105,7 +105,7 @@ app.put('/tasks/:id', function (req, res) {
 app.post('/tasks', function (req, res) {
 
   // Validate the status
-  if (status && !isValidStatus(req.body.status)) {
+  if (!isValidStatus(req.body.status)) {
     res.status(400).send('Invalid status value');
     return;
   }
