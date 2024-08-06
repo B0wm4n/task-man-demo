@@ -89,9 +89,8 @@ app.put('/tasks/:id', function (req, res) {
 
 app.post('/tasks', function (req, res) {
   const sql = 'INSERT INTO tasks (Title, description, status) VALUES (?, ?, "PENDING")';
-  const params = [req.body.title, req.body.description];
 
-  db.run(sql, params, function (err) {
+  db.run(sql, [req.body.title, req.body.description], function (err) {
     if (err) {
       console.log(err.message);
       res.status(500).send('Internal Server Error');
