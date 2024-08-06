@@ -9,7 +9,7 @@ The docker container will have an install of SQLite installed as well, it shoul 
 
 The project was developed in Linx and the test script (See Documentation) runs as a bash script.  it can be executed from the root directory by ./Documentation/test-deployment
 
-By Default the container is going to use port 3000, this can be modified in the Docker File by changing "3000:80" to "####:80"
+By Default the container is going to use port 3000, this can be modified in the compose.yaml File by changing "3000:80" to "####:80"
 
 There is no warrantly with any of the code, expressed or implied.  Use at your risk, you're mileage will vary. 
 
