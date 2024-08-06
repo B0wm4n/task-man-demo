@@ -10,11 +10,37 @@ const server = app.listen(443, function () {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const db = new sqlite3.Database('bwuah.db', sqlite3.OPEN_READWRITE, (err) => {
+const db = new sqlite3.Database('tasks.db', sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     console.error(err.message);
+  } else {
+    console.log('Connected to the task database.');
+
+    db.serialize(() => {
+      db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='tasks'`, (err, row) => {
+        if (err) {
+          console.error(err.message);
+        } else if (row) {
+          console.log('Table "tasks" already exists.');
+        } else {
+          db.run(`CREATE TABLE tasks (
+            taskid INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            description TEXT,
+            status TEXT NOT NULL,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+	    updated DATETIME DEFAULT CURRENT_TIMESTAMP
+          )`, (err) => {
+            if (err) {
+              console.error(err.message);
+            } else {
+              console.log('Table "tasks" has been created.');
+            }
+          });
+        }
+      });
+    });
   }
-  console.log('Connected to the task database.');
 });
 
 const express = require('express');
